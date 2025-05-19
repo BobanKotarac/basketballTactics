@@ -1,69 +1,109 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, PanResponder, StyleSheet, Text, TouchableOpacity } from "react-native";
-import type { Position } from "../types";
+import {
+  Animated,
+  GestureResponderEvent,
+  PanResponder,
+  StyleSheet,
+  Text,
+} from "react-native";
 
-interface PlayerProps {
+type Position = {
+  x: number;
+  y: number;
+};
+
+type PlayerProps = {
   id: string;
   number: number;
   position: Position;
-  radius?: number;
   onDragEnd: (id: string, x: number, y: number) => void;
-  onPress?: () => void;  // add optional onPress prop
-  isSelected?: boolean;  // add this prop
-}
+  onDoubleTap: (id: string) => void;
+};
 
-const Player: React.FC<PlayerProps> = ({
+export default function Player({
   id,
   number,
   position,
-  radius = 20,
   onDragEnd,
-  onPress,
-  isSelected = false, // default false
-}) => {
-  const pan = useRef(new Animated.ValueXY({ x: position.x, y: position.y })).current;
+  onDoubleTap,
+}: PlayerProps) {
+  const pan = useRef(new Animated.ValueXY({ x: position.x, y: position.y }))
+    .current;
+
+  const lastTap = useRef<number | null>(null);
+  const tapTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     pan.setValue({ x: position.x, y: position.y });
   }, [position.x, position.y]);
 
+  const handleTap = () => {
+    const now = Date.now();
+    if (lastTap.current && now - lastTap.current < 300) {
+      // double tap detected
+      if (tapTimeout.current) {
+        clearTimeout(tapTimeout.current);
+        tapTimeout.current = null;
+      }
+      onDoubleTap(id);
+    } else {
+      tapTimeout.current = setTimeout(() => {
+        tapTimeout.current = null;
+      }, 300);
+    }
+    lastTap.current = now;
+  };
+
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
-        pan.setOffset({ x: pan.x._value, y: pan.y._value });
+        pan.setOffset({
+          x: (pan.x as any).__getValue(),
+          y: (pan.y as any).__getValue(),
+        });
         pan.setValue({ x: 0, y: 0 });
       },
       onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], {
         useNativeDriver: false,
       }),
-      onPanResponderRelease: () => {
+      onPanResponderRelease: (
+        e: GestureResponderEvent,
+        gestureState
+      ) => {
         pan.flattenOffset();
-        onDragEnd(id, pan.x._value, pan.y._value);
+        onDragEnd(id, (pan.x as any).__getValue(), (pan.y as any).__getValue());
+
+        // Detect tap vs drag by checking gesture movement distance
+        if (
+          Math.abs(gestureState.dx) < 5 &&
+          Math.abs(gestureState.dy) < 5
+        ) {
+          handleTap();
+        }
       },
     })
   ).current;
 
+  const radius = 25;
+
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={{ position: "absolute", left: 0, top: 0 }}>
-      <Animated.View
-        {...panResponder.panHandlers}
-        style={[
-          styles.player,
-          {
-            width: radius * 2,
-            height: radius * 2,
-            borderRadius: radius,
-            backgroundColor: isSelected ? "green" : "blue",
-            transform: pan.getTranslateTransform(),
-          },
-        ]}
-      >
-        <Text style={styles.playerNumber}>{number}</Text>
-      </Animated.View>
-    </TouchableOpacity>
+    <Animated.View
+      {...panResponder.panHandlers}
+      style={[
+        styles.player,
+        {
+          width: radius * 2,
+          height: radius * 2,
+          borderRadius: radius,
+          transform: pan.getTranslateTransform(),
+        },
+      ]}
+    >
+      <Text style={styles.number}>{number}</Text>
+    </Animated.View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   player: {
@@ -72,11 +112,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "absolute",
   },
-  playerNumber: {
+  number: {
     color: "white",
     fontWeight: "bold",
-    fontSize: 16,
   },
 });
-
-export default Player;

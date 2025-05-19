@@ -3,7 +3,7 @@
 import React from "react";
 import { Dimensions, ImageBackground, StyleSheet, View } from "react-native";
 
-const courtImage = require("../assets/court.png");
+const courtImage = require("../assets/court.jpg");
 
 export default function CourtBackground({ children }: { children: React.ReactNode }) {
   const { height } = Dimensions.get("window");

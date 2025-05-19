@@ -25,7 +25,7 @@ export default function Court({
             id={player.id}
             number={parseInt(player.id)} // or actual player.number if you have it
             position={player.position}
-            onDragEnd={handleDragEnd} // your handler function
+            onDragEnd={onDragEnd} // your handler function
         />
       
       

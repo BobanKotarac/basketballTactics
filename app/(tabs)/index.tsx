@@ -1,34 +1,19 @@
-// app/index.tsx (Welcome Screen)
-import { Link } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+// app/(tabs)/index.tsx
 
-export default function WelcomeScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>🏀 Basketball Tactics</Text>
-      <Link href="/(tabs)/home" style={styles.button}>
-        <Text>Get Started</Text>
-      </Link>
-    </View>
-  );
+import { Tabs } from "expo-router";
+import React, { useState } from "react";
+import WelcomeScreen from "../../components/WelcomeScreen";
+
+export default function RootLayout() {
+  // Start by showing the welcome screen
+  const [showWelcome, setShowWelcome] = useState(true);
+
+  // If we haven’t dismissed yet, render <WelcomeScreen />:
+  if (showWelcome) {
+    // Pass setShowWelcome(false) as the onDismiss callback
+    return <WelcomeScreen onDismiss={() => setShowWelcome(false)} />;
+  }
+
+  // Otherwise render your normal tab navigator
+  return <Tabs />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 30,
-  },
-  button: {
-    padding: 15,
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
-  },
-});

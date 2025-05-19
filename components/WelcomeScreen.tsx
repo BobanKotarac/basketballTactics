@@ -1,22 +1,22 @@
 // components/WelcomeScreen.tsx
-import React from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
 
-interface Props {
-  onPressStart?: () => void;
-}
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export default function WelcomeScreen({ onPressStart }: Props) {
+type WelcomeScreenProps = {
+  onDismiss: () => void;
+};
+
+export default function WelcomeScreen({ onDismiss }: WelcomeScreenProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🏀 Basketball Tactics</Text>
-      <Text style={styles.subtitle}>
-        Welcome! Let’s get you started.
+      <Text style={styles.heading}>🏀 Welcome to Basketball Tactics! 🏀</Text>
+      <Text style={styles.subtext}>
+        Design plays, position players, and add arrows to show movement. Let&apos;s get started.
       </Text>
-      <Button
-        title="Get Started"
-        onPress={onPressStart}
-      />
+      <TouchableOpacity style={styles.button} onPress={onDismiss}>
+        <Text style={styles.buttonText}>Go to My Plays</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -24,19 +24,32 @@ export default function WelcomeScreen({ onPressStart }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 12,
+  heading: {
+    fontSize: 28,
+    fontWeight: "700",
+    marginBottom: 16,
+    textAlign: "center",
   },
-  subtitle: {
-    fontSize: 18,
-    textAlign: 'center',
+  subtext: {
+    fontSize: 16,
+    textAlign: "center",
     marginBottom: 24,
+    color: "#444",
+  },
+  button: {
+    backgroundColor: "#1E90FF",
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600",
   },
 });

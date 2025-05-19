@@ -2,12 +2,12 @@
 
 import React, { useRef } from "react";
 import {
-  GestureResponderEvent,
-  Image,
-  PanResponder,
-  PanResponderGestureState,
-  StyleSheet,
-  ViewStyle,
+    GestureResponderEvent,
+    Image,
+    PanResponder,
+    PanResponderGestureState,
+    StyleSheet,
+    ViewStyle,
 } from "react-native";
 
 // Replace with your player‐icon.png (a small circle or silhouette)

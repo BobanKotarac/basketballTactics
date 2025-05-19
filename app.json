@@ -8,9 +8,15 @@
     "scheme": "basketballtactics",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "splash": {
+          "image": "./assets/lopta.jpg",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        },
     "ios": {
       "supportsTablet": true
     },
+
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",

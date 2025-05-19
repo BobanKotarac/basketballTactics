@@ -1,75 +1,82 @@
-// components/PlayerToken.tsx
+import React, { useEffect, useRef } from "react";
+import { Animated, PanResponder, StyleSheet, Text, TouchableOpacity } from "react-native";
+import type { Position } from "../types";
 
-import React, { useRef } from "react";
-import {
-  GestureResponderEvent,
-  Image,
-  PanResponder,
-  PanResponderGestureState,
-  StyleSheet,
-  ViewStyle,
-} from "react-native";
+interface PlayerProps {
+  id: string;
+  number: number;
+  position: Position;
+  radius?: number;
+  onDragEnd: (id: string, x: number, y: number) => void;
+  onPress?: () => void;  // add optional onPress prop
+  isSelected?: boolean;  // add this prop
+}
 
-// Replace with your player‐icon.png (a small circle or silhouette)
-const playerIcon = require("../assets/player-icon.png");
-
-type PlayerTokenProps = {
-  id: string;                              // unique ID for this player
-  initialX: number;                        // starting X (in px relative to court)
-  initialY: number;                        // starting Y (in px)
-  onPositionChange: (id: string, x: number, y: number) => void;
-  style?: ViewStyle;
-};
-
-export default function PlayerToken({
+const Player: React.FC<PlayerProps> = ({
   id,
-  initialX,
-  initialY,
-  onPositionChange,
-  style,
-}: PlayerTokenProps) {
-  const pan = useRef({
-    x: initialX,
-    y: initialY,
-  }).current;
+  number,
+  position,
+  radius = 20,
+  onDragEnd,
+  onPress,
+  isSelected = false, // default false
+}) => {
+  const pan = useRef(new Animated.ValueXY({ x: position.x, y: position.y })).current;
+
+  useEffect(() => {
+    pan.setValue({ x: position.x, y: position.y });
+  }, [position.x, position.y]);
 
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onPanResponderGrant: (_e: GestureResponderEvent, _gestureState: PanResponderGestureState) => {
-        // Nothing special on grant
+      onPanResponderGrant: () => {
+        pan.setOffset({ x: pan.x._value, y: pan.y._value });
+        pan.setValue({ x: 0, y: 0 });
       },
-      onPanResponderMove: (_e, gestureState) => {
-        // Update pan.x / pan.y in real time
-        pan.x = initialX + gestureState.dx;
-        pan.y = initialY + gestureState.dy;
-        onPositionChange(id, pan.x, pan.y);
-      },
-      onPanResponderRelease: (_e, _gestureState) => {
-        // Nothing else—final position is already reported via onPanResponderMove
+      onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }], {
+        useNativeDriver: false,
+      }),
+      onPanResponderRelease: () => {
+        pan.flattenOffset();
+        onDragEnd(id, pan.x._value, pan.y._value);
       },
     })
   ).current;
 
   return (
-    <Image
-      source={playerIcon}
-      {...panResponder.panHandlers}
-      style={[
-        {
-          position: "absolute",
-          left: pan.x,
-          top: pan.y,
-          width: 40,
-          height: 40,
-          zIndex: 2,
-        },
-        style,
-      ]}
-    />
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={{ position: "absolute", left: 0, top: 0 }}>
+      <Animated.View
+        {...panResponder.panHandlers}
+        style={[
+          styles.player,
+          {
+            width: radius * 2,
+            height: radius * 2,
+            borderRadius: radius,
+            backgroundColor: isSelected ? "green" : "blue",
+            transform: pan.getTranslateTransform(),
+          },
+        ]}
+      >
+        <Text style={styles.playerNumber}>{number}</Text>
+      </Animated.View>
+    </TouchableOpacity>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  // empty if inline styles suffice
+  player: {
+    backgroundColor: "blue",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+  },
+  playerNumber: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
 });
+
+export default Player;

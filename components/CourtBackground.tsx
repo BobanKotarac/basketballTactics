@@ -1,12 +1,13 @@
 // components/CourtBackground.tsx
-import React from 'react';
-import { Dimensions, ImageBackground, StyleSheet, View } from 'react-native';
 
-const courtImage = require('../assets/court.jpg');
+import React from "react";
+import { Dimensions, ImageBackground, StyleSheet, View } from "react-native";
+
+const courtImage = require("../assets/court.png");
 
 export default function CourtBackground({ children }: { children: React.ReactNode }) {
-  const { width } = Dimensions.get('window');
-  const height = width * (50 / 94); // Maintain court aspect ratio
+  const { height } = Dimensions.get("window");
+  const width = height * (50 / 94); // Portrait aspect ratio
 
   return (
     <ImageBackground
@@ -20,8 +21,12 @@ export default function CourtBackground({ children }: { children: React.ReactNod
 }
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    // width & height set dynamically
+    alignSelf: 'center',
+  },
   overlay: {
     flex: 1,
+    position: "relative",
   },
 });

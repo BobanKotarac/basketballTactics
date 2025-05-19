@@ -1,15 +1,10 @@
-import { Stack } from "expo-router";
-import { PlayersProvider } from "../context/PlayersContext";
+import { Slot } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function RootLayout() {
+export default function Layout() {
   return (
-    <PlayersProvider>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} /> {/* Welcome Screen */}
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> {/* Home Hub */}
-        <Stack.Screen name="add-players" options={{ title: "Add Players" }} />
-        <Stack.Screen name="tactics-board" options={{ title: "Tactics Board" }} />
-      </Stack>
-    </PlayersProvider>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Slot />
+    </SafeAreaView>
   );
 }
